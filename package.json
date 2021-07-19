@@ -28,6 +28,7 @@
     "uglifyjs": "latest"
   },
   "dependencies": {
+    "typescript": "^4.3.5",
     "yubinbango-core": "^0.6.3"
   }
 }

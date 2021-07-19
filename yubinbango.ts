@@ -5,7 +5,7 @@ const HADRLIST = ["p-region-id", "p-region", "p-locality", "p-street-address", "
 module YubinBango {
   export class MicroformatDom {
     constructor(
-      ) {
+    ) {
       this.hadrloop();
     }
     hadrloop() {
@@ -15,21 +15,29 @@ module YubinBango {
         // country-name が日本かどうかチェック
         if (this.countryNameCheck(hadr)) {
           // 郵便番号の入力欄を取得
-          const postalcode = hadr.querySelectorAll('.p-postal-code');
-          // 郵便番号入力欄が1つの場合でも3桁-4桁で2つに分かれている場合でも両方に対応するため、それぞれのh-adr内の中の最後のpostal-codeにkeyupイベントを付与する
-          postalcode[postalcode.length - 1].addEventListener("keyup", (e)=>{
-            MicroformatDom.prototype.applyDom(this.getFormNode(e.target.parentNode));
-          }, false);
+          const button = hadr.querySelector('.p-postal-button');
+          //検索ボタン有れば自動で入れないように
+          if (button === undefined) {
+            const postalcode = hadr.querySelectorAll('.p-postal-code');
+            // 郵便番号入力欄が1つの場合でも3桁-4桁で2つに分かれている場合でも両方に対応するため、それぞれのh-adr内の中の最後のpostal-codeにinputイベントを付与する
+            postalcode[postalcode.length - 1].addEventListener("input", (e) => {
+              MicroformatDom.prototype.applyDom(this.getFormNode(e.target.parentNode));
+            }, false);
+          } else {
+            button.addEventListener('click', (e) => {
+              MicroformatDom.prototype.applyDom(this.getFormNode(e.target.parentNode));
+            }, false);
+          }
         }
       });
     }
-    getFormNode(elm){
-      return (elm.tagName !== "FORM" && !elm.classList.contains("h-adr"))? this.getFormNode(elm.parentNode) : elm;
+    getFormNode(elm) {
+      return (elm.tagName !== "FORM" && !elm.classList.contains("h-adr")) ? this.getFormNode(elm.parentNode) : elm;
     }
     // 日本かどうかチェックする
     countryNameCheck(elm) {
       const a = elm.querySelector('.p-country-name');
-      const arr:string[] = [a.innerHTML, a.value];
+      const arr: string[] = [a.innerHTML, a.value];
       return (arr.some((val: string) => (ISO31661JP.indexOf(val) >= 0)))
     }
     applyDom(elm) {
@@ -45,7 +53,7 @@ module YubinBango {
       fnlist.map((fn) => HADRLIST.map((val: string) => fn(val, elm, address)));
     }
     postalFormClear(val: string, elm, data?) {
-      if (data){
+      if (data) {
         const addrs = elm.querySelectorAll('.' + val);
         [].map.call(addrs, (addr) => {
           return addr.value = '';
@@ -62,7 +70,7 @@ module YubinBango {
       };
       const addrs = elm.querySelectorAll('.' + val);
       [].map.call(addrs, (addr) => {
-        return addr.value += (o[val])? o[val] : '';
+        return addr.value += (o[val]) ? o[val] : '';
       });
     }
   }
